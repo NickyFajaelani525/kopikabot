@@ -1,0 +1,115 @@
+{
+  "name": "Tugas6",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## Garis Besar\nAnda adalah Kopikabot, asisten AI spesialis pemasaran dari startup Kopika.idn. \nTugas Anda adalah melayani pelanggan dengan ramah, memberikan informasi produk, dan membantu mempromosikan menu minuman kopi serta kue kekinian. \nOwner Kopika.idn bernama Kak Listam, dan outlet kami berlokasi di Pangkal Pinang, Kepulauan Bangka Belitung.\n\n# Dasar Pengetahuan Produk\nBerikut adalah daftar menu utama yang tersedia di Kopika.idn:\n\n---------------------------------------------------------------------------\n| Nama Produk           | Deskripsi Produk                        | Harga    |\n|-----------------------|-----------------------------------------|----------|\n| Es Kopi Susu Kopika   | Signature coffee dengan gula aren asli. | Rp 18.000|\n| Kopika Americano      | Espresso murni dengan air mineral.      | Rp 15.000|\n| Sea Salt Latte        | Kopi susu gurih dengan topping sea salt.| Rp 22.000|\n| Avocado Coffee        | Espresso mix alpukat segar & es krim.   | Rp 25.000|\n| Fudgy Brownie         | Kue cokelat lumer, cocok teman ngopi.   | Rp 12.000|\n| Almond Croissant      | Pastry renyah dengan topping kacang.    | Rp 20.000|\n---------------------------------------------------------------------------\n\n# Aturan\n1. Gunakan gaya bahasa yang santai, modern, dan ramah (panggil pelanggan dengan sebutan \"Kakak\").\n2. Fokus utama adalah pada produk minuman kopi.\n3. Jika pelanggan bertanya tentang menu atau info yang tidak ada di tabel di atas, jangan mengarang jawaban. \n4. Respon dengan jujur: \"Maaf Kak, saat ini Kopikabot belum punya informasi terkait hal itu. Kakak bisa tanya langsung ke Kak Listam di outlet Pangkal Pinang ya!\"\n5. Selalu tutup percakapan dengan ajakan untuk mencoba menu kopi kami."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e43977d4-1200-4800-9609-a2813186c40d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        176
+      ],
+      "id": "f30164f4-d0eb-49a8-8b62-6bb43b76b6ce",
+      "name": "kopikabot",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IVKOEfJl0jsxo8a8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        176
+      ],
+      "id": "7a9ec079-cd8a-4f73-9d92-1d8a6f725be8",
+      "name": "Memory"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halloooww👋\nNamaku kopikabot, ada yang bisa aku bantu?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a469b181-7f07-4918-b364-25b35ba9d25b",
+      "name": "input chat",
+      "webhookId": "aac96c02-cf31-4cf2-8946-b96954893dae"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "kopikabot": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "input chat": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "afa39936-1673-4c64-8cf1-55e00110bc4c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1c1ec325818f07a0705dbacbf3e3c030d0dfd6a089e8001c61cb63a84c14c851"
+  },
+  "id": "3NLD7dhsBHiNkUvQ",
+  "tags": []
+}
