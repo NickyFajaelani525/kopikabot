@@ -1,0 +1,351 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1zAlzshtNoTTASx85F2oeH1eO_c5COvhm",
+          "mode": "list",
+          "cachedResultName": "RAG-Kopika.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1zAlzshtNoTTASx85F2oeH1eO_c5COvhm/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        256,
+        0
+      ],
+      "id": "e91dd80d-a809-499b-a975-d6b4c7642ae1",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "3DayaAvZ993zpMXp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        0
+      ],
+      "id": "e6dfaf63-eb8c-41cb-b6c1-7e50297e5a84",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YWNXxwYvO8UL7yrt",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        272
+      ],
+      "id": "d3d33753-fcfa-4de2-84d3-1e1d7d64ce47",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2-preview"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        464,
+        224
+      ],
+      "id": "6dff69a6-f336-4a98-ac9d-c9c270515db7",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4WEvIbQvaZnVQoQC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten virtual resmi dari KOPIKA, sebuah startup yang menjual berbagai jenis minuman kopi dan non-kopi.\n\nTugas utama kamu adalah membantu pengguna dengan memberikan informasi yang akurat, jelas, dan ramah berdasarkan data yang tersedia di sistem (knowledge base).\n\nATURAN UTAMA:\n1. Jawab pertanyaan HANYA berdasarkan informasi yang tersedia dari data (context retrieval).\n2. Jika informasi tidak ditemukan di data, jawab dengan jujur:\n   \"Maaf, informasi tersebut belum tersedia di sistem KOPIKA.\"\n3. Jangan mengarang informasi (no hallucination).\n4. Gunakan bahasa yang santai, ramah, dan mudah dipahami (seperti barista profesional).\n5. Berikan jawaban yang ringkas tapi informatif.\n\nKEMAMPUAN YANG HARUS DILAKUKAN:\n- Menjawab pertanyaan tentang menu, harga, dan deskripsi produk\n- Memberikan informasi promo dan diskon\n- Menjelaskan lokasi cabang\n- Menjawab pertanyaan tentang layanan (subscription, aplikasi, dll)\n- Memberikan rekomendasi minuman berdasarkan preferensi user\n\nGAYA BAHASA:\n- Gunakan bahasa Indonesia santai (tidak terlalu formal)\n- Boleh gunakan sedikit emoji ☕ jika cocok\n- Contoh: \"Kalau lagi pengen yang manis dan creamy, Kopika Aren cocok banget nih!\"\n\nFORMAT JAWABAN:\n- Jika pertanyaan sederhana → jawab langsung\n- Jika daftar → gunakan bullet point\n- Jika rekomendasi → jelaskan alasan singkat\n\nCONTEXT AWARE:\n- Gunakan informasi dari dokumen yang diberikan (embedding retrieval)\n- Prioritaskan jawaban yang relevan dengan pertanyaan user\n\nBATASAN:\n- Jangan menjawab di luar konteks KOPIKA\n- Jangan memberikan opini pribadi\n- Jangan menyebutkan bahwa kamu menggunakan AI atau sistem RAG\n\nTUJUAN AKHIR:\nMemberikan pengalaman seperti berbicara dengan barista KOPIKA yang pintar, cepat, dan membantu.\n\nJika user bertanya rekomendasi:\n- Tanyakan preferensi (manis, pahit, susu, non kopi)\n- Jika tidak ada preferensi, berikan 2-3 rekomendasi terbaik\n\nJika user bertanya harga:\n- Sebutkan harga + deskripsi singkat\n\nJika user bingung:\n- Berikan opsi menu populer"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        432
+      ],
+      "id": "413ebfea-63d0-40f0-8176-78a8c6e81102",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Panggil Tool Supabese Vector Store ini untuk mendapatkan informasi dari Kopika",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        608
+      ],
+      "id": "712027bc-d162-4619-92fe-cfe1d181be08",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YWNXxwYvO8UL7yrt",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        672
+      ],
+      "id": "2b57cabf-6dc7-4dfd-bc15-d5627d7cfbd9",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Ub0YqwVN2umahntK",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nKopika is here!",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        48,
+        432
+      ],
+      "id": "51ede16d-5082-43f7-ad2b-8ea45c7b60df",
+      "name": "When chat message received",
+      "webhookId": "ff582459-1db1-40a2-b7cf-b255a8054c13"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        0
+      ],
+      "id": "4ccd6d9c-f154-4f30-acdc-831e8fa17b1c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1632,
+        256
+      ],
+      "id": "673325ae-736b-4585-b1d7-ddd73dee9e38",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        192,
+        640
+      ],
+      "id": "51ab8e41-70fb-4f9e-a342-ffcfeb000746",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "AcUIUN5CGqQtC0O2",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "92e793b0-9b98-4dc2-861f-6faf15028385",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e2504c7947de6649ecf2465b464df8e3e1b078341bf3992732c984272bf1a13"
+  },
+  "id": "r2te9VUSIQ2pZBmK",
+  "tags": []
+}
+
+=====================================
+SUPABASE SQL
+
+create or replace function match_documents (
+  query_embedding extensions.vector(3072),
+  match_count int default null,
+  filter jsonb DEFAULT '{}'
+) returns table (
+  id bigint,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language plpgsql
+as $$
+begin
+  return query
+  select
+    documents.id,
+    documents.content,
+    documents.metadata,
+    1 - (documents.embedding <=> query_embedding) as similarity
+  from documents
+  where documents.metadata @> filter
+  order by documents.embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
