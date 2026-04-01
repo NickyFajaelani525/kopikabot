@@ -322,6 +322,7 @@
 }
 
 =====================================
+
 SUPABASE SQL
 
 create or replace function match_documents (
