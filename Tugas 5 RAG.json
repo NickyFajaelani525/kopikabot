@@ -1,0 +1,451 @@
+{
+  "name": "Tugas 5 RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1h4rsu2gB5ffgeAPR3xYr7afYVys2N6y-",
+          "mode": "list",
+          "cachedResultName": "RAG",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1h4rsu2gB5ffgeAPR3xYr7afYVys2N6y-"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "27b63d27-6fc7-467a-9151-f4a8802721cd",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "3DayaAvZ993zpMXp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "310956ee-cee2-461b-8eff-cf7be05d3b16",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2547e1ce-70a0-4aa1-b1b2-bb2eaf418cd3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "85cbad70-6b51-4583-8617-a7363d099451",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "3DayaAvZ993zpMXp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "42ac048b-eebb-48b2-a895-97ca46a6d71b",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "66dab3b3-431f-4876-a693-0ad2d9acb993",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YWNXxwYvO8UL7yrt",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2-preview"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        832,
+        160
+      ],
+      "id": "117e362e-cbe8-49ee-8232-fc9a0e2ee9ba",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4WEvIbQvaZnVQoQC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $('Edit Fields').item.json.file_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        304
+      ],
+      "id": "b693e8b9-802c-4bb3-961d-7830c1947690",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        896,
+        496
+      ],
+      "id": "97da98cb-b012-4674-90d8-d0cfd6a11800",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nKopikabot here!",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        160,
+        208
+      ],
+      "id": "05bb5436-44c9-41a1-b024-3d9e0ad69cc5",
+      "name": "When chat message received",
+      "webhookId": "a647293d-1e73-48e4-abcc-e5d71986861e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten virtual resmi dari KOPIKA, sebuah startup yang menjual berbagai jenis minuman kopi dan non-kopi.\n\nTugas utama kamu adalah membantu pengguna dengan memberikan informasi yang akurat, jelas, dan ramah berdasarkan data yang tersedia di sistem (knowledge base).\n\n🔴 ATURAN PENTING (WAJIB DIIKUTI):\n1. SETIAP pertanyaan user HARUS terlebih dahulu mencari informasi menggunakan tool \"Supabase Vector Store\".\n2. Jangan menjawab sebelum melakukan pencarian ke dalam dokumen.\n3. Gunakan hasil dari tool sebagai satu-satunya sumber jawaban.\n4. Jika tool tidak mengembalikan informasi yang relevan, jawab:\n   \"Maaf, informasi tersebut belum tersedia di sistem KOPIKA.\"\n5. DILARANG mengarang jawaban (no hallucination).\n\n🎯 CARA MENJAWAB:\n- Ambil informasi dari hasil retrieval (dokumen)\n- Ringkas dan jelaskan dengan bahasa santai\n- Jangan menyebutkan tool, database, atau proses retrieval\n\n☕ GAYA BAHASA:\n- Santai, ramah, seperti barista\n- Boleh pakai emoji secukupnya\n- Contoh: \"Kalau lagi pengen yang creamy, ini cocok banget nih!\"\n\n📌 KEMAMPUAN:\n- Menu & deskripsi minuman\n- Harga\n- Promo\n- Lokasi cabang\n- Layanan\n- Rekomendasi minuman\n\n📋 FORMAT:\n- Jawaban singkat → langsung\n- List → bullet point\n- Rekomendasi → kasih alasan singkat\n\n🚫 BATASAN:\n- Jangan jawab di luar konteks KOPIKA\n- Jangan pakai pengetahuan umum\n- Jangan jawab tanpa data dari tool\n\n🎯 TUJUAN:\nMenjadi barista KOPIKA yang pintar, cepat, dan selalu berbasis data.\n\nJika user minta rekomendasi:\n- Tanyakan preferensi dulu\n- Jika tidak ada → beri 2-3 opsi terbaik dari data\n\nJika user tanya harga:\n- Sebutkan harga + deskripsi dari dokumen"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        368,
+        208
+      ],
+      "id": "307d1f22-5bd8-4686-8fc3-836a9a054e4f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        96,
+        496
+      ],
+      "id": "aefd2fe9-0023-4694-9845-71982030ac7b",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "AcUIUN5CGqQtC0O2",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Panggil Tool ini untuk menjawab tiap pertanyaan terkait kopika",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        496
+      ],
+      "id": "bae6ee16-ee96-42ab-a31f-8ec7663058c3",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YWNXxwYvO8UL7yrt",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2-preview"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        624
+      ],
+      "id": "e75303e7-ccfb-48c9-b923-8492dbbca11c",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4WEvIbQvaZnVQoQC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        496
+      ],
+      "id": "a89b3168-edc1-4b08-89e6-8bd6ad33675b",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Ub0YqwVN2umahntK",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ebe42413-bd7b-4518-8a18-374e29309271",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e2504c7947de6649ecf2465b464df8e3e1b078341bf3992732c984272bf1a13"
+  },
+  "id": "TgO7RZhJ5VWpRxsM",
+  "tags": []
+}
