@@ -235,7 +235,7 @@
       "id": "02af878f-9287-4e62-8708-76fc429a4c23",
       "name": "Append row in sheet",
       "credentials": {
-        "googleSheetsOAuth2Api": {
+        "googleSheetsOAuth2": {
           "id": "iznSsu81UKxxcoqg",
           "name": "Google Sheets account 2"
         }
@@ -257,13 +257,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "url": "https://.pdfshift.io/v3/convert/pdf",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "X-API-KEY",
-              "value": "sk_69818f0af268d4a9ce31df4198f848365e0293df"
+              "value": "cihuy"
             }
           ]
         },
